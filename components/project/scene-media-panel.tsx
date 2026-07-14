@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { FileText, ImageIcon, LoaderCircle, Music2, Upload, Video } from "lucide-react";
 import { api, jsonBody } from "@/lib/api";
 import type { Scene } from "@/lib/types";
@@ -26,15 +26,26 @@ function PreviewIcon({ kind }: { kind: SceneMediaKind }) {
 export function SceneMediaPanel({
   workspaceId,
   scene,
+  playSignal,
   onUpdated,
 }: {
   workspaceId: string;
   scene: Scene | null;
+  playSignal?: number;
   onUpdated: (scene: Scene) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [status,setStatus]=useState("");
   const [pending,setPending]=useState(false);
+
+  useEffect(() => {
+    if (!playSignal || scene?.playback?.kind !== "video") return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video.play().catch(() => undefined);
+  }, [playSignal, scene?.id, scene?.playback?.kind]);
 
   async function upload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -81,7 +92,7 @@ export function SceneMediaPanel({
       {playback?.kind === "image" && playback.url ?
         // eslint-disable-next-line @next/next/no-img-element
         <img src={playback.url} alt="" /> : null}
-      {playback?.kind === "video" && playback.url ? <video src={playback.url} muted playsInline controls /> : null}
+      {playback?.kind === "video" && playback.url ? <video ref={videoRef} src={playback.url} muted playsInline controls /> : null}
       {playback?.kind === "audio" && playback.url ? <div className="scene-audio-preview"><Music2/><audio src={playback.url} controls /></div> : null}
       {!playback?.url || playback?.kind === "document" ? <span><PreviewIcon kind={kind}/></span> : null}
     </div>

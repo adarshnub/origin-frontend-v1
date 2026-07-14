@@ -29,6 +29,7 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
   const [view,setView] = useState<View>("scenes");
   const [selectedId,setSelectedId] = useState<string | null>(null);
   const [sync,setSync] = useState("Saved");
+  const [playSignal,setPlaySignal] = useState(0);
   const project = useQuery({ queryKey: ["project", projectId], queryFn: () => api<Project>(`/projects/${projectId}`) });
   const scenes = useMemo(() => project.data?.scenes ?? [], [project.data?.scenes]);
   const selected = useMemo(() => scenes.find((scene) => scene.id === selectedId) ?? scenes[0] ?? null, [scenes, selectedId]);
@@ -75,6 +76,12 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
     setSelectedId(scene.id);
   }
 
+  function playScene(scene: Scene) {
+    setView("scenes");
+    setSelectedId(scene.id);
+    setPlaySignal((value) => value + 1);
+  }
+
   return <main className="project-workspace">
     <header className="project-topbar">
       <div>
@@ -99,8 +106,8 @@ export function ProjectWorkspace({ projectId }: { projectId: string }) {
             <div><p className="eyebrow">{view}</p><h1>{view === "scenes" ? "Build in scenes." : view === "sequence" ? "Shape the cut." : view === "settings" ? "Project settings." : "Project library."}</h1></div>
             {view !== "settings" && <CreateSceneDialog projectId={projectId} onCreated={added} />}
           </header>
-          {view === "scenes" && scenes.length ? <SceneMediaPanel workspaceId={project.data.workspaceId} scene={selected} onUpdated={updated} /> : null}
-          {scenes.length ? <div className="scene-grid">{scenes.map((scene) => <SceneCard key={scene.id} scene={scene} selected={selected?.id === scene.id} onSelect={() => setSelectedId(scene.id)} />)}</div> : <div className="stage-empty"><Sparkles /><h2>No scenes yet.</h2><p>Add a scene or begin with one of the Shot Design workflows.</p><CreateSceneDialog projectId={projectId} onCreated={added} /></div>}
+          {view === "scenes" && scenes.length ? <SceneMediaPanel workspaceId={project.data.workspaceId} scene={selected} playSignal={playSignal} onUpdated={updated} /> : null}
+          {scenes.length ? <div className="scene-grid">{scenes.map((scene) => <SceneCard key={scene.id} scene={scene} selected={selected?.id === scene.id} onSelect={() => setSelectedId(scene.id)} onPlay={playScene} />)}</div> : <div className="stage-empty"><Sparkles /><h2>No scenes yet.</h2><p>Add a scene or begin with one of the Shot Design workflows.</p><CreateSceneDialog projectId={projectId} onCreated={added} /></div>}
         </>}
       </section>
       <HistoryPanel scene={selected} />

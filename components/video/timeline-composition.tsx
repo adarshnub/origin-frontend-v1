@@ -10,5 +10,5 @@ function Visual({ item }: { item: TimelineItem }) {
 
 export function TimelineComposition({ document }: { document: TimelineDocument }) {
   const fps=document.output.fps;
-  return <AbsoluteFill style={{backgroundColor:"#000",color:"#f5ebdd"}}>{document.items.map(item=>{const from=Math.round(item.startMs/1000*fps);const durationInFrames=Math.max(1,Math.round(item.durationMs/1000*fps));if(item.kind==="audio"&&item.sourceUrl)return <Sequence key={item.id} from={from} durationInFrames={durationInFrames}><Audio src={item.sourceUrl} startFrom={Math.round((item.sourceStartMs??0)/1000*fps)} volume={item.muted?0:item.volume??1}/></Sequence>;return <Sequence key={item.id} from={from} durationInFrames={durationInFrames}><Visual item={item}/></Sequence>;})}</AbsoluteFill>;
+  return <AbsoluteFill style={{backgroundColor:"#000",color:"#f7faff"}}>{document.items.map(item=>{const from=Math.round(item.startMs/1000*fps);const durationInFrames=Math.max(1,Math.round(item.durationMs/1000*fps));if(item.kind==="audio"&&item.sourceUrl)return <Sequence key={item.id} from={from} durationInFrames={durationInFrames}><Audio src={item.sourceUrl} startFrom={Math.round((item.sourceStartMs??0)/1000*fps)} volume={item.muted?0:item.volume??1}/></Sequence>;return <Sequence key={item.id} from={from} durationInFrames={durationInFrames}><Visual item={item}/></Sequence>;})}</AbsoluteFill>;
 }
