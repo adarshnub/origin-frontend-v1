@@ -1,0 +1,10 @@
+export interface User { id: string; email: string; displayName: string; isGlobalAdmin?: boolean }
+export interface Workspace { id: string; name: string; slug: string; kind: "personal" | "team"; role: "owner" | "admin" | "editor" | "viewer" }
+export interface Project { id: string; workspaceId: string; name: string; description: string; thumbnailUrl?: string | null; revision: number; updatedAt: string; scenes?: Scene[] }
+export interface SceneVersion { id: string; sceneId: string; parentVersionId?: string | null; kind: "image" | "video" | "audio" | "document" | "plan"; prompt: string; settings: Record<string, unknown>; inputAssetIds: string[]; outputAssetIds: string[]; status: "draft" | "processing" | "ready" | "failed"; createdAt: string }
+export interface ScenePlayback { assetId: string; assetVersionId: string; kind: "image" | "video" | "audio" | "document"; mimeType: string; storagePath: string; url: string | null }
+export interface Scene { id: string; projectId: string; title: string; sortKey: string; durationMs: number; trimStartMs: number; trimEndMs?: number | null; currentVersionId?: string | null; currentVersion?: SceneVersion | null; playback?: ScenePlayback | null; updatedAt: string }
+export interface VideoProject { id: string; workspaceId: string; sourceProjectId?: string | null; name: string; thumbnailUrl?: string | null; currentVersionId?: string | null; updatedAt: string; timeline?: TimelineDocument }
+export interface TimelineTrack { id: string; kind: "video" | "audio" | "caption" | "overlay"; name: string; muted?: boolean }
+export interface TimelineItem { id: string; trackId: string; kind: "video" | "image" | "audio" | "text" | "caption"; startMs: number; durationMs: number; sourceStartMs?: number; assetId?: string; sourceUrl?: string; text?: string; volume?: number; muted?: boolean }
+export interface TimelineDocument { schemaVersion: 1; durationMs: number; tracks: TimelineTrack[]; items: TimelineItem[]; output: { width: number; height: number; fps: number } }
